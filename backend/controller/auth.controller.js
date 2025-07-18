@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -145,4 +146,71 @@ export const sendOTP = async (req, res) => {
     console.error("Send OTP Error:", error);
     res.status(500).json({ message: "Failed to send OTP." });
   }
+};
+
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "No user with this email" });
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 دقائق
+  await user.save();
+
+  const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+  const message = `
+    <h1>Password Reset Request</h1>
+    <p>Click the link below to reset your password:</p>
+    <a href="${resetURL}">${resetURL}</a>
+    <p>This link will expire in 10 minutes.</p>
+  `;
+
+  try {
+    await sendEmail(user.email, "Password Reset", message);
+    res.status(200).json({ message: "Reset link sent to email." });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+    res.status(500).json({ message: "Failed to send reset email." });
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword, confirmPassword } = req.body;
+
+  if (!newPassword || newPassword.length < 6) {
+    return res.status(400).json({ message: "Password must be at least 6 characters." });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match." });
+  }
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Token is invalid or has expired." });
+  }
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Password reset successful." });
 };

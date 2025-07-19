@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
   otpExpires: { type: Date },
   resetPasswordToken: { type: String },
   resetPasswordExpire: { type: Date },
-  isAdmin: { type: Boolean, default: false } 
+  isAdmin: { type: Boolean, default: false },
+  token: { type: String } //  أضف هذا السطر لتخزين التوكن
 });
 
 const User = mongoose.model("User", userSchema);

@@ -1,17 +1,34 @@
 import Product from "../models/product.model.js";
 
+// Create Product
 export const createProduct = async (req, res) => {
   try {
-    const { name, price, description, category, image, stock, createdAt } = req.body;
+    const {
+      name,
+      price,
+      description,
+      category,
+      image1,
+      image2,
+      image3,
+      image4,
+      image5,
+      image6,
+      stock,
+    } = req.body;
 
     const product = new Product({
       name,
       price,
       description,
       category,
-      image,
-      stock,
-      createdAt, // اختياري لأن الموديل بيحط default تلقائي
+      image1,
+      image2,
+      image3,
+      image4,
+      image5,
+      image6,
+      stock
     });
 
     await product.save();
@@ -22,8 +39,9 @@ export const createProduct = async (req, res) => {
   }
 };
 
-export const getAllProducts = async (req,res) => {
-      try {
+// Get All Products
+export const getAllProducts = async (req, res) => {
+  try {
     const products = await Product.find().sort({ createdAt: -1 });
     res.status(200).json(products);
   } catch (error) {
@@ -31,7 +49,7 @@ export const getAllProducts = async (req,res) => {
   }
 };
 
-
+// Get Product by ID
 export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -42,6 +60,7 @@ export const getProductById = async (req, res) => {
   }
 };
 
+// Update Product
 export const updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
@@ -57,6 +76,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
+// Delete Product
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);

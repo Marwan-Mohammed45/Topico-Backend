@@ -8,12 +8,7 @@ export const createProduct = async (req, res) => {
       price,
       description,
       category,
-      image1,
-      image2,
-      image3,
-      image4,
-      image5,
-      image6,
+      images, // ← مصفوفة صور
       stock,
     } = req.body;
 
@@ -22,13 +17,8 @@ export const createProduct = async (req, res) => {
       price,
       description,
       category,
-      image1,
-      image2,
-      image3,
-      image4,
-      image5,
-      image6,
-      stock
+      images,
+      stock,
     });
 
     await product.save();
@@ -63,14 +53,24 @@ export const getProductById = async (req, res) => {
 // Update Product
 export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(
+    const {
+      name,
+      price,
+      description,
+      category,
+      images, // ← مصفوفة صور جديدة
+      stock
+    } = req.body;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { name, price, description, category, images, stock },
       { new: true }
     );
 
-    if (!product) return res.status(404).json({ message: "Product not found" });
-    res.status(200).json({ message: "Product updated successfully", product });
+    if (!updatedProduct) return res.status(404).json({ message: "Product not found" });
+
+    res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
   } catch (error) {
     res.status(500).json({ message: "Failed to update product" });
   }

@@ -20,6 +20,18 @@ app.get("/", (req, res) => {
   res.send("✅ Server is working");
 });
 
+// ✅ استخدم async function لتشغيل السيرفر بعد الاتصال بالداتا بيز
+const startServer = async () => {
+  try {
+    await connectDb(); // الاتصال بقاعدة البيانات
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Database connection failed:", error);
+    process.exit(1); // خروج في حالة وجود خطأ
+  }
+};
 
-await connectDb();
-export default app;
+startServer();

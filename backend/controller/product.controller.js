@@ -1,7 +1,6 @@
-// ✅ Product Controller with Validation
+
 import Product from "../models/product.model.js";
 
-// Helper function for validation
 const validateProductFields = ({ name, price, description, category, images, stock }) => {
   if (!name || !price || !description || !category || !images || !Array.isArray(images) || images.length === 0 || stock == null) {
     return "All product fields are required and images must be a non-empty array.";
@@ -29,7 +28,7 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// Get All Products
+
 export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -39,7 +38,7 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
-// Get Product by ID
+
 export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -50,7 +49,7 @@ export const getProductById = async (req, res) => {
   }
 };
 
-// Update Product
+
 export const updateProduct = async (req, res) => {
   try {
     const { name, price, description, category, images, stock } = req.body;
@@ -72,7 +71,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// Delete Product
+
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);

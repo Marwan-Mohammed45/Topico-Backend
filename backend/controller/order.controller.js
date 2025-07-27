@@ -1,17 +1,18 @@
 import Order from "../models/Order.model.js";
 import Product from "../models/product.model.js";
 
+
 export const createOrder = async (req, res) => {
   try {
-    const { items, totalPrice, shippingAddress } = req.body;
+    const { orderItems, totalPrice, shippingAddress } = req.body;
 
-    if (!items || items.length === 0) {
+    if (!orderItems || orderItems.length === 0) {
       return res.status(400).json({ message: "Order must contain at least one item." });
     }
 
     const order = new Order({
-      user: req.user._id, // من middleware
-      items,
+      user: req.user._id, 
+      orderItems,
       totalPrice,
       shippingAddress,
     });
@@ -24,7 +25,7 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// جلب كل الطلبات (Admin فقط)
+
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().populate("user", "name email");
@@ -34,7 +35,7 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
-// جلب الطلبات الخاصة بمستخدم معيّن
+
 export const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id });
@@ -44,7 +45,7 @@ export const getUserOrders = async (req, res) => {
   }
 };
 
-// تعديل حالة الطلب
+
 export const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -59,7 +60,7 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-//  حذف طلب (Admin فقط)
+
 export const deleteOrder = async (req, res) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);

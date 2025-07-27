@@ -1,27 +1,27 @@
+// ✅ Product Controller with Validation
 import Product from "../models/product.model.js";
+
+// Helper function for validation
+const validateProductFields = ({ name, price, description, category, images, stock }) => {
+  if (!name || !price || !description || !category || !images || !Array.isArray(images) || images.length === 0 || stock == null) {
+    return "All product fields are required and images must be a non-empty array.";
+  }
+  if (typeof price !== "number" || price < 0) return "Price must be a valid number.";
+  if (typeof stock !== "number" || stock < 0) return "Stock must be a valid number.";
+  return null;
+};
 
 // Create Product
 export const createProduct = async (req, res) => {
   try {
-    const {
-      name,
-      price,
-      description,
-      category,
-      images, // ← مصفوفة صور
-      stock,
-    } = req.body;
+    const { name, price, description, category, images, stock } = req.body;
 
-    const product = new Product({
-      name,
-      price,
-      description,
-      category,
-      images,
-      stock,
-    });
+    const validationError = validateProductFields({ name, price, description, category, images, stock });
+    if (validationError) return res.status(400).json({ message: validationError });
 
+    const product = new Product({ name, price, description, category, images, stock });
     await product.save();
+
     res.status(201).json({ message: "Product created successfully", product });
   } catch (error) {
     console.error("Create Product Error:", error);
@@ -53,14 +53,10 @@ export const getProductById = async (req, res) => {
 // Update Product
 export const updateProduct = async (req, res) => {
   try {
-    const {
-      name,
-      price,
-      description,
-      category,
-      images, // ← مصفوفة صور جديدة
-      stock
-    } = req.body;
+    const { name, price, description, category, images, stock } = req.body;
+
+    const validationError = validateProductFields({ name, price, description, category, images, stock });
+    if (validationError) return res.status(400).json({ message: validationError });
 
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,

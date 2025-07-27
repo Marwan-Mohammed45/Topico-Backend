@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   resetPasswordToken: { type: String },
   resetPasswordExpire: { type: Date },
   isAdmin: { type: Boolean, default: false },
-  token: { type: String } //  أضف هذا السطر لتخزين التوكن
+  token: { type: String } 
 });
 
 const User = mongoose.model("User", userSchema);

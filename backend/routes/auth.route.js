@@ -6,7 +6,10 @@ import {
   verifyOTP,
   forgotPassword,
   resetPassword,
+  getAllUsers
 } from "../controller/auth.controller.js";
+import { isAdmin, verifyToken } from "../middleware/auth.middleware.js";
+
 
 const router = express.Router();
 
@@ -16,5 +19,6 @@ router.post("/signout", signout);
 router.post("/verify-otp", verifyOTP);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
+router.get("/", verifyToken, isAdmin, getAllUsers);
 
 export default router;

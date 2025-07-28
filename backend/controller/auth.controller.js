@@ -155,21 +155,17 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: "No user with this email" });
     }
 
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-
-    user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpires = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-    const message = `<h1>Password Reset Request</h1><p>Click below:</p><a href="${resetURL}">${resetURL}</a>`;
+    await sendEmail(user.email, "Reset Password OTP", otpTemplate(otp));
 
-    await sendEmail(user.email, "Password Reset", message);
-    res.status(200).json({ message: "Reset link sent to email." });
+    res.status(200).json({ message: "OTP sent to email for password reset." });
   } catch (error) {
     console.error("Forgot Password Error:", error);
-    res.status(500).json({ message: "Failed to send reset email." });
+    res.status(500).json({ message: "Failed to send OTP." });
   }
 };
 
@@ -204,5 +200,15 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Reset Password Error:", error);
     res.status(500).json({ message: "Failed to reset password." });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("name email isAdmin createdAt _id");
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Get All Users Error:", error);
+    res.status(500).json({ message: "Failed to fetch users." });
   }
 };

@@ -77,12 +77,28 @@ export const signin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin }, // ← أضفنا isAdmin هنا
+      {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        isAdmin: user.isAdmin
+      },
       process.env.JWT_SECRET,
       { expiresIn: "365d" }
     );
 
-    res.status(200).json({ message: "Login successful.", token });
+    res.status(200).json({
+      message: "Login successful.",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        isAdmin: user.isAdmin
+      }
+    });
   } catch (error) {
     console.error("Signin Error:", error);
     res.status(500).json({ message: "Internal server error." });

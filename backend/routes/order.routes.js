@@ -11,11 +11,11 @@ import { verifyToken, isAdmin } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-// مستخدم عادي
+// For Normal User
 router.post("/", verifyToken, createOrder);
 router.get("/my-orders", verifyToken, getUserOrders);
 
-// للمشرف فقط
+// For Admin User
 router.get("/", verifyToken, isAdmin, getAllOrders);
 router.put("/:id", verifyToken, isAdmin, updateOrderStatus);
 router.delete("/:id", verifyToken, isAdmin, deleteOrder);

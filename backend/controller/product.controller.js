@@ -1,4 +1,3 @@
-
 import Product from "../models/product.model.js";
 
 const validateProductFields = ({ name, price, description, category, images, stock }) => {
@@ -28,7 +27,6 @@ export const createProduct = async (req, res) => {
   }
 };
 
-
 export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -37,7 +35,6 @@ export const getAllProducts = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch products" });
   }
 };
-
 
 export const getProductById = async (req, res) => {
   try {
@@ -48,7 +45,6 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ message: "Error fetching product" });
   }
 };
-
 
 export const updateProduct = async (req, res) => {
   try {
@@ -71,7 +67,6 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
@@ -80,5 +75,26 @@ export const deleteProduct = async (req, res) => {
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete product" });
+  }
+};
+
+export const searchProducts = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ message: "Please provide a search query" });
+    }
+
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } }
+      ]
+    });
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to search products" });
   }
 };
